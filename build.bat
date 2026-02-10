@@ -1,6 +1,6 @@
 @echo off
 REM Boa Language - Build Script for Windows
-REM Requires: Visual Studio 2022 with C++ workload, CMake 3.16+
+REM Requires: Visual Studio (2017 or later) with C++ workload, CMake 3.16+
 
 echo ========================================
 echo  Boa Language Build Script
@@ -20,7 +20,7 @@ cd build
 
 REM Configure
 echo [1/3] Configuring CMake...
-cmake .. -G "Visual Studio 17 2022" -A x64
+cmake .. -A x64
 if %errorlevel% neq 0 (
     echo ERROR: CMake configuration failed.
     cd ..

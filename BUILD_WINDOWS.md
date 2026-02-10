@@ -4,8 +4,8 @@ This document describes how to build the Boa programming language from source on
 
 ## Prerequisites
 
-- **Visual Studio 2022** (or later) with C++ desktop development workload
-  - Or **MSVC Build Tools 2022** (command-line only)
+- **Visual Studio 2017** (or later) with C++ desktop development workload
+  - Or **MSVC Build Tools** (command-line only)
 - **CMake 3.16+** (included with Visual Studio or install separately)
 - **Git** (for cloning the repository)
 
@@ -20,12 +20,12 @@ cd Boa
 
 ### 2. Configure with CMake
 
-Open a **Developer Command Prompt for VS 2022** (or x64 Native Tools Command Prompt):
+Open a **Developer Command Prompt for Visual Studio** (or x64 Native Tools Command Prompt):
 
 ```cmd
 mkdir build
 cd build
-cmake .. -G "Visual Studio 17 2022" -A x64
+cmake .. -A x64
 ```
 
 Or for NMake:
