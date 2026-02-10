@@ -38,3 +38,6 @@ test_results/
 # Installer output
 installer/*.exe
 installer/*.msi
+
+# CodeQL build artifacts
+_codeql_build_dir/
