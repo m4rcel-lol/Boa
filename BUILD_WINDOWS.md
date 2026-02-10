@@ -92,6 +92,15 @@ Ensure CMake is in your PATH. If using Visual Studio, open the **Developer Comma
 ### Compiler errors
 Ensure you're using MSVC (cl.exe) and not MinGW. The project requires C++17 support.
 
+### NMake Makefiles error with `-A x64`
+If you see an error like `Generator NMake Makefiles does not support platform specification`, you are likely running from a **Developer Command Prompt** where CMake defaults to NMake. Use the NMake command instead:
+
+```cmd
+cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release
+```
+
+The `build.bat` script handles this automatically by falling back to NMake Makefiles when the Visual Studio generator is not available.
+
 ### Test failures
 Run with verbose output: `ctest --output-on-failure -V -C Release`
 
