@@ -1,0 +1,16 @@
+imp io
+
+io.print("For loop:")
+for i in range(5):
+    io.print("  i =", i)
+
+io.print("While loop:")
+x = 0
+while x < 5:
+    io.print("  x =", x)
+    x += 1
+
+io.print("Nested loops:")
+for i in range(3):
+    for j in range(3):
+        io.print("  (" + str(i) + "," + str(j) + ")")

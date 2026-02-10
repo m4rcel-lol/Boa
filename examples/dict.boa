@@ -1,0 +1,20 @@
+imp io
+
+# Dictionary creation
+person = {"name": "Alice", "age": 30, "city": "London"}
+io.print("Person:", person)
+
+# Access
+io.print("Name:", person["name"])
+io.print("Age:", person["age"])
+
+# Modify
+person["age"] = 31
+io.print("Updated age:", person["age"])
+
+# Add new key
+person["email"] = "alice@example.com"
+io.print("With email:", person)
+
+# Length
+io.print("Number of entries:", len(person))

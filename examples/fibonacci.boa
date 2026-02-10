@@ -1,0 +1,11 @@
+imp io
+
+fn fib(n):
+    if n < 2:
+        n
+    else:
+        fib(n - 1) + fib(n - 2)
+
+io.print("Fibonacci sequence:")
+for i in range(12):
+    io.print("fib(" + str(i) + ") =", fib(i))

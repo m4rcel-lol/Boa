@@ -1,0 +1,22 @@
+imp io
+
+# String operations
+greeting = "Hello, World!"
+io.print("String:", greeting)
+io.print("Length:", len(greeting))
+io.print("First char:", greeting[0])
+io.print("Last char:", greeting[-1])
+
+# String concatenation
+first = "Boa"
+second = "Lang"
+io.print("Concatenated:", first + " " + second)
+
+# String repetition
+io.print("Repeated:", "ab" * 5)
+
+# Type conversion
+num = 42
+io.print("Number to string:", str(num))
+io.print("String to int:", int("123"))
+io.print("Type of string:", type(greeting))
