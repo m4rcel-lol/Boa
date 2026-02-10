@@ -1,0 +1,68 @@
+name: Boa CI (Windows)
+
+on:
+  push:
+    branches: [ main, 'copilot/**' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        build_type: [Release, Debug]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure CMake
+      run: cmake -B build -G "Visual Studio 17 2022" -A x64
+
+    - name: Build
+      run: cmake --build build --config ${{ matrix.build_type }}
+
+    - name: Run Unit Tests
+      run: |
+        cd build
+        ctest --output-on-failure -C ${{ matrix.build_type }}
+
+    - name: Run Example Scripts
+      run: |
+        $boa = "build\${{ matrix.build_type }}\boa.exe"
+        Get-ChildItem examples\*.boa | ForEach-Object {
+          Write-Host "Running $_"
+          & $boa $_.FullName
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+        }
+      shell: pwsh
+
+    - name: Upload Artifacts
+      if: matrix.build_type == 'Release'
+      uses: actions/upload-artifact@v4
+      with:
+        name: boa-windows-x64
+        path: |
+          build/Release/boa.exe
+          build/Release/boa_tests.exe
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+    - name: Build
+      run: cmake --build build -j $(nproc)
+
+    - name: Run Unit Tests
+      run: cd build && ctest --output-on-failure
+
+    - name: Run Example Scripts
+      run: |
+        for f in examples/*.boa; do
+          echo "Running $f"
+          ./build/boa "$f" || exit 1
+        done
