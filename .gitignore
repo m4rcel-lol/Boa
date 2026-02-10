@@ -1,0 +1,40 @@
+# Build artifacts
+build/
+out/
+cmake-build-*/
+*.obj
+*.o
+*.exe
+*.dll
+*.lib
+*.a
+*.so
+*.dylib
+*.pdb
+*.ilk
+*.exp
+
+# IDE files
+.vs/
+.vscode/
+*.suo
+*.user
+*.sln.docstates
+.idea/
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Dependencies
+vcpkg_installed/
+packages/
+
+# Test artifacts
+Testing/
+test_results/
+
+# Installer output
+installer/*.exe
+installer/*.msi
