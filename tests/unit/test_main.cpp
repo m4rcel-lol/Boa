@@ -291,8 +291,7 @@ TEST(interp_scope) {
         "    x\n"
         "print(f())\n"
         "print(x)\n";
-    // f() modifies x in the outer scope (Python-like assignment)
-    // Actually with our environment.set, it finds x in parent and updates it
+    // f() finds x in the outer scope and updates it (Boa uses assignment-to-outer-scope semantics)
     EXPECT_EQ(boa::run_and_capture(src), "2\n2\n");
 }
 
