@@ -1,0 +1,29 @@
+imp io
+
+fn add(a, b):
+    a + b
+
+fn subtract(a, b):
+    a - b
+
+fn multiply(a, b):
+    a * b
+
+fn divide(a, b):
+    if b == 0:
+        io.print("Error: division by zero")
+        none
+    else:
+        a / b
+
+fn power(base, exp):
+    base ** exp
+
+io.print("Calculator Demo")
+io.print("===============")
+io.print("5 + 3 =", add(5, 3))
+io.print("10 - 4 =", subtract(10, 4))
+io.print("6 * 7 =", multiply(6, 7))
+io.print("15 / 4 =", divide(15, 4))
+io.print("2 ** 8 =", power(2, 8))
+io.print("10 / 0 =", divide(10, 0))

@@ -1,0 +1,17 @@
+imp io
+
+# Try/except for error handling
+io.print("Error Handling Demo")
+
+try:
+    x = 10 / 0
+except e:
+    io.print("Caught error:", e)
+
+try:
+    nums = [1, 2, 3]
+    io.print(nums[10])
+except e:
+    io.print("Caught index error:", e)
+
+io.print("Program continues after error handling")

@@ -1,0 +1,30 @@
+imp io
+
+# List creation
+nums = [1, 2, 3, 4, 5]
+io.print("Original list:", nums)
+
+# Indexing
+io.print("First element:", nums[0])
+io.print("Last element:", nums[-1])
+
+# Length
+io.print("Length:", len(nums))
+
+# Append
+append(nums, 6)
+io.print("After append:", nums)
+
+# Modify
+nums[0] = 10
+io.print("After modify:", nums)
+
+# List concatenation
+a = [1, 2]
+b = [3, 4]
+io.print("Concatenated:", a + b)
+
+# Iteration
+io.print("Iterating:")
+for n in nums:
+    io.print("  ", n)

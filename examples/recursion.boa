@@ -1,0 +1,30 @@
+imp io
+
+# Recursive factorial
+fn factorial(n):
+    if n <= 1:
+        1
+    else:
+        n * factorial(n - 1)
+
+io.print("Factorial examples:")
+for i in range(11):
+    io.print("  " + str(i) + "! =", factorial(i))
+
+# Recursive sum
+fn sum_to(n):
+    if n <= 0:
+        0
+    else:
+        n + sum_to(n - 1)
+
+io.print("Sum 1..100 =", sum_to(100))
+
+# Recursive power
+fn pow(base, exp):
+    if exp == 0:
+        1
+    else:
+        base * pow(base, exp - 1)
+
+io.print("3^5 =", pow(3, 5))

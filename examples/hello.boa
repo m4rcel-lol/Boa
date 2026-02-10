@@ -1,0 +1,2 @@
+imp io
+io.print("Hello, Boa!")
