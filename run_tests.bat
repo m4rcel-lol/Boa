@@ -6,10 +6,14 @@ echo.
 
 if not exist build\Release\boa_tests.exe (
     if not exist build\Debug\boa_tests.exe (
-        echo ERROR: Tests not built. Run build.bat first.
-        exit /b 1
+        if not exist build\boa_tests.exe (
+            echo ERROR: Tests not built. Run build.bat first.
+            exit /b 1
+        )
+        set TEST_EXE=build\boa_tests.exe
+    ) else (
+        set TEST_EXE=build\Debug\boa_tests.exe
     )
-    set TEST_EXE=build\Debug\boa_tests.exe
 ) else (
     set TEST_EXE=build\Release\boa_tests.exe
 )
@@ -26,10 +30,14 @@ echo Running integration tests...
 
 if not exist build\Release\boa.exe (
     if not exist build\Debug\boa.exe (
-        echo ERROR: boa.exe not built. Run build.bat first.
-        exit /b 1
+        if not exist build\boa.exe (
+            echo ERROR: boa.exe not built. Run build.bat first.
+            exit /b 1
+        )
+        set BOA_EXE=build\boa.exe
+    ) else (
+        set BOA_EXE=build\Debug\boa.exe
     )
-    set BOA_EXE=build\Debug\boa.exe
 ) else (
     set BOA_EXE=build\Release\boa.exe
 )
