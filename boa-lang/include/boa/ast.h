@@ -1,5 +1,7 @@
 #pragma once
 
+#include "token.h"
+
 #include <memory>
 #include <string>
 #include <utility>
