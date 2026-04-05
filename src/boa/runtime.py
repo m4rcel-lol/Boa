@@ -205,9 +205,9 @@ def _eval_binary(op: str, left: Any, right: Any) -> Any:
         return left <= right
     if op == ">=":
         return left >= right
-    if op == "==:":
+    if op == "==:":  # Boa identity operator (`is`)
         return left is right
-    if op == "!==:":
+    if op == "!==:":  # Boa identity-negation operator (`is not`)
         return left is not right
     if op == "~":
         return left in right

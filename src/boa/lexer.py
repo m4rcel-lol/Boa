@@ -45,7 +45,7 @@ DOUBLE_OPS = {
     "..",
 }
 
-TRIPLE_OPS = {"!==:"}
+FOUR_CHAR_OPS = {"!==:"}
 
 SINGLE = set("()[]{}:,.?+-*/%=<>!|")
 
@@ -94,7 +94,7 @@ def tokenize(source: str) -> list[Token]:
                 break
 
             long_op = raw[i : i + 4]
-            if long_op in TRIPLE_OPS:
+            if long_op in FOUR_CHAR_OPS:
                 tokens.append(Token("OP", long_op, line_num, i + 1))
                 i += 4
                 continue
