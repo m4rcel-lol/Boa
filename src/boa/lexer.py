@@ -93,9 +93,9 @@ def tokenize(source: str) -> list[Token]:
             if ch == "#":
                 break
 
-            triple = raw[i : i + 4]
-            if triple in TRIPLE_OPS:
-                tokens.append(Token("OP", triple, line_num, i + 1))
+            long_op = raw[i : i + 4]
+            if long_op in TRIPLE_OPS:
+                tokens.append(Token("OP", long_op, line_num, i + 1))
                 i += 4
                 continue
 

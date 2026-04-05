@@ -79,7 +79,10 @@ class BoaInstance:
 
 
 def _boa_range(*args: Any) -> list[int]:
-    ints = [int(a) for a in args]
+    try:
+        ints = [int(a) for a in args]
+    except (TypeError, ValueError) as exc:
+        raise RuntimeErrorBoa("range() arguments must be integers") from exc
     return list(range(*ints))
 
 
