@@ -123,9 +123,9 @@ def _convert_range_sugar(expr: str) -> str:
 
 def _convert_types(expr: str) -> str:
     """Convert compact Boa type hints to Python typing names."""
-    expr = re.sub(r"\b([A-Za-z_][\w]*)\?\b", r"Optional[\1]", expr)
     expr = re.sub(r"\[([^\[\]]+)\]", r"list[\1]", expr)
     expr = re.sub(r"\{([^:{}]+):([^{}]+)\}", r"dict[\1,\2]", expr)
+    expr = re.sub(r"\b([A-Za-z_][\w]*)\?(?!\w)", r"Optional[\1]", expr)
 
     def _map_simple(match: re.Match[str]) -> str:
         token = match.group(1)
@@ -135,9 +135,52 @@ def _convert_types(expr: str) -> str:
     return expr
 
 
+def _convert_type_annotations(line: str) -> str:
+    """Convert only annotation contexts, avoiding runtime expression rewrites."""
+    out = line
+    out = re.sub(
+        r"->\s*([^:]+)(:)",
+        lambda m: f"-> {_convert_types(m.group(1).strip())}{m.group(2)}",
+        out,
+    )
+    out = re.sub(
+        r":\s*([^=,\)\n]+?)(?=\s*(?:=|,|\)|$))",
+        lambda m: f": {_convert_types(m.group(1).strip())}",
+        out,
+    )
+    return out
+
+
 def _convert_len_shorthand(expr: str) -> str:
     """Convert #name style shorthand into len(name)."""
-    return re.sub(r"(?<!\w)#([A-Za-z_][\w]*)", r"len(\1)", expr)
+    return _replace_outside_strings(
+        expr,
+        re.compile(r"(?<!\w)#([A-Za-z_][\w]*)"),
+        r"len(\1)",
+    )
+
+
+def _convert_self_shorthand(expr: str) -> str:
+    """Convert Boa self shorthand in common method contexts."""
+    out = re.sub(r"\bs(?=\.)", "self", expr)
+
+    def _fix_params(match: re.Match[str]) -> str:
+        params = match.group(1).split(",")
+        fixed: list[str] = []
+        for param in params:
+            stripped = param.strip()
+            if re.fullmatch(r"s(\s*(:.*)?)?", stripped):
+                if ":" in stripped:
+                    fixed.append(param.replace("s", "self", 1))
+                else:
+                    fixed.append(param.replace("s", "self", 1))
+            else:
+                fixed.append(param)
+        return "(" + ",".join(fixed) + ")"
+
+    out = re.sub(r"\(([^)]*)\)", _fix_params, out)
+    out = re.sub(r"\breturn\s+s\b", "return self", out)
+    return out
 
 
 def _convert_keywords(expr: str) -> str:
@@ -147,7 +190,6 @@ def _convert_keywords(expr: str) -> str:
         (r"\bafn\b", "async def"),
         (r"\bret\b", "return"),
         (r"\bcls\b", "class"),
-        (r"\bs\b", "self"),
         (r"\bnil\b", "None"),
         (r"\byes\b", "True"),
         (r"\bno\b", "False"),
@@ -159,7 +201,6 @@ def _convert_keywords(expr: str) -> str:
         (r"\bgbl\b", "global"),
         (r"\bnlo\b", "nonlocal"),
         (r"\bef\b", "elif"),
-        (r"\b\.\.\b", "pass"),
         (r"!==:", "is not"),
         (r"==:", "is"),
         (r"!~", "not in"),
@@ -206,10 +247,7 @@ def _convert_out_ask(expr: str) -> str:
     if stripped.startswith("out "):
         payload = stripped[4:]
         return expr.replace(stripped, f"print({payload})")
-    if stripped.startswith("ask "):
-        payload = stripped[4:]
-        return expr.replace("ask " + payload, f"input({payload})")
-    return expr
+    return re.sub(r"(?<![\w\"'])\bask\s+([^\n]+)", r"input(\1)", expr)
 
 
 def _normalize_blank_lines(lines: list[str]) -> list[str]:
@@ -235,7 +273,6 @@ def transpile_source(source: str, file_name: str = "<memory>") -> str:
 
     for line in parsed.lines:
         raw = line.raw
-        text = raw
         if in_triple is not None:
             out_lines.append(raw.rstrip())
             if in_triple in raw:
@@ -261,13 +298,20 @@ def transpile_source(source: str, file_name: str = "<memory>") -> str:
 
         try:
             transformed = code_part
+            if transformed.strip() == "..":
+                transformed = transformed.replace("..", "pass", 1)
+                rebuilt = f"{transformed.rstrip()}{comment_part}"
+                out_lines.append(rebuilt.rstrip())
+                continue
+
             transformed = _convert_use_statements(transformed)
             transformed = _convert_with_alias(transformed)
             transformed = _convert_out_ask(transformed)
-            transformed = _convert_keywords(transformed)
             transformed = _convert_range_sugar(transformed)
+            transformed = _convert_keywords(transformed)
+            transformed = _convert_self_shorthand(transformed)
             transformed = _convert_len_shorthand(transformed)
-            transformed = _convert_types(transformed)
+            transformed = _convert_type_annotations(transformed)
             transformed = re.sub(r"\bcatch\b", "except", transformed)
             transformed = re.sub(r"\bend\b", "finally", transformed)
 
