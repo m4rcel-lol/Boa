@@ -1,0 +1,14 @@
+cls Animal:
+    fn __init__(s, name: s, sound: s):
+        s.name = name
+        s.sound = sound
+
+    fn speak(s) -> s:
+        ret f"{s.name} says {s.sound}"
+
+cls Dog(Animal):
+    fn __init__(s, name: s):
+        super().__init__(name, "Woof")
+
+d = Dog("Rex")
+out d.speak()

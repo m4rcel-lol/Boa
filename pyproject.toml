@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling>=1.20.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "boa-lang"
+version = "0.1.0"
+description = "Boa: a statically-transpiled shorthand superset of Python"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+license = { text = "MIT" }
+authors = [
+  { name = "Boa Contributors" }
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+  "pyinstaller>=6.0.0",
+]
+
+[project.scripts]
+boa = "boa.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/boa"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

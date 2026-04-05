@@ -1,0 +1,11 @@
+use asyncio
+
+afn fetch_data(url: s) -> s:
+    aw asyncio.sleep(1)
+    ret f"Data from {url}"
+
+afn main():
+    result = aw fetch_data("https://example.com")
+    out result
+
+asyncio.run(main())
