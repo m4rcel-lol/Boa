@@ -170,10 +170,7 @@ def _convert_self_shorthand(expr: str) -> str:
         for param in params:
             stripped = param.strip()
             if re.fullmatch(r"s(\s*(:.*)?)?", stripped):
-                if ":" in stripped:
-                    fixed.append(param.replace("s", "self", 1))
-                else:
-                    fixed.append(param.replace("s", "self", 1))
+                fixed.append(param.replace("s", "self", 1))
             else:
                 fixed.append(param)
         return "(" + ",".join(fixed) + ")"
