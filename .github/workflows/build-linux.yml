@@ -1,0 +1,41 @@
+name: build-linux
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .[dev]
+      - name: Build binary
+        run: pyinstaller --onefile -n boa src/boa/cli.py
+      - name: Rename binary artifact
+        run: |
+          mkdir -p dist-artifact
+          cp dist/boa dist-artifact/boa-linux-x86_64
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: boa-linux-x86_64
+          path: dist-artifact/boa-linux-x86_64
+      - name: Create release and upload asset
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist-artifact/boa-linux-x86_64

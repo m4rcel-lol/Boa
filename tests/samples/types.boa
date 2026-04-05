@@ -1,0 +1,14 @@
+fn add(a: i, b: i) -> i:
+    ret a + b
+
+fn to_float(x: i) -> f:
+    ret f(x)
+
+fn is_even(n: i) -> b:
+    ret n % 2 == 0
+
+mapping: {s:i} = {"a": 1, "b": 2}
+maybe: s? = nil
+
+out add(3, 4)
+out is_even(10)

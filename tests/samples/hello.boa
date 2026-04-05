@@ -1,0 +1,14 @@
+use os
+use sys
+
+fn greet(name: s) -> s:
+    ret f"Hello, {name}!"
+
+fn main():
+    name = ask "Enter your name: "
+    out greet(name)
+    nums = [1, 2, 3, 4, 5]
+    out #nums
+    out [x * 2 for x ~ nums]
+
+main()
