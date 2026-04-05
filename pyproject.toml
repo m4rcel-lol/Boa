@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "boa-lang"
-version = "0.1.0"
-description = "Boa: a statically-transpiled shorthand superset of Python"
+version = "0.2.0"
+description = "Boa: a standalone custom language with its own compiler pipeline and runtime"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []
