@@ -64,3 +64,35 @@ def test_cli_install_to_existing_directory(tmp_path: Path, monkeypatch) -> None:
     assert code == 0
     assert expected.exists()
     assert expected.read_text(encoding="utf-8") == "boa"
+
+
+def test_cli_install_rejects_existing_file_without_force(
+    tmp_path: Path, monkeypatch
+) -> None:
+    source = tmp_path / "boa-source"
+    source.write_text("new", encoding="utf-8")
+
+    monkeypatch.setattr("boa.cli._current_installable_path", lambda: source)
+    destination = tmp_path / "bin" / "boa"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text("old", encoding="utf-8")
+
+    code = main(["install", str(destination)])
+    assert code == 1
+    assert destination.read_text(encoding="utf-8") == "old"
+
+
+def test_cli_install_overwrites_existing_file_with_force(
+    tmp_path: Path, monkeypatch
+) -> None:
+    source = tmp_path / "boa-source"
+    source.write_text("new", encoding="utf-8")
+
+    monkeypatch.setattr("boa.cli._current_installable_path", lambda: source)
+    destination = tmp_path / "bin" / "boa"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text("old", encoding="utf-8")
+
+    code = main(["install", str(destination), "--force"])
+    assert code == 0
+    assert destination.read_text(encoding="utf-8") == "new"

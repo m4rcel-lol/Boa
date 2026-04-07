@@ -40,6 +40,11 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Install the current Boa executable/script to a target path",
     )
     install_p.add_argument("destination", type=str)
+    install_p.add_argument(
+        "--force",
+        action="store_true",
+        help="Overwrite destination if it already exists",
+    )
 
     sub.add_parser("version", help="Print Boa version")
     sub.add_parser("help", help="Show usage")
@@ -84,7 +89,7 @@ def _resolve_install_destination(destination: Path, source_name: str) -> Path:
     return destination
 
 
-def _cmd_install(destination: Path) -> int:
+def _cmd_install(destination: Path, *, force: bool = False) -> int:
     source = _current_installable_path()
     target = _resolve_install_destination(destination, source.name)
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -93,9 +98,16 @@ def _cmd_install(destination: Path) -> int:
         print(f"Already installed at {target}")
         return 0
 
+    if target.exists() and not force:
+        print(
+            f"Destination already exists: {target} (use --force to overwrite)",
+            file=sys.stderr,
+        )
+        return 1
+
     shutil.copy2(source, target)
     if not sys.platform.startswith("win"):
-        target.chmod(target.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP)
+        target.chmod(target.stat().st_mode | stat.S_IXUSR)
 
     print(f"Installed {target}")
     return 0
@@ -114,7 +126,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         if args.command == "install":
-            return _cmd_install(Path(args.destination))
+            return _cmd_install(Path(args.destination), force=args.force)
 
         source = Path(args.source)
         if not source.exists():
