@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 from pathlib import Path
+import stat
 import subprocess
 import sys
+
+import pytest
 
 from boa import __version__
 from boa.cli import main
@@ -96,3 +99,16 @@ def test_cli_install_overwrites_existing_file_with_force(
     code = main(["install", str(destination), "--force"])
     assert code == 0
     assert destination.read_text(encoding="utf-8") == "new"
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="POSIX mode bits only")
+def test_cli_install_sets_user_executable_bit(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "boa-source"
+    source.write_text("boa", encoding="utf-8")
+
+    monkeypatch.setattr("boa.cli._current_installable_path", lambda: source)
+    destination = tmp_path / "bin" / "boa"
+    code = main(["install", str(destination)])
+
+    assert code == 0
+    assert destination.stat().st_mode & stat.S_IXUSR
