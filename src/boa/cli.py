@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import shutil
+import stat
 import sys
 
 if __package__:
@@ -33,6 +35,17 @@ def _build_parser() -> argparse.ArgumentParser:
     check_p = sub.add_parser("check", help="Parse and type-check a .boa file")
     check_p.add_argument("source", type=str)
 
+    install_p = sub.add_parser(
+        "install",
+        help="Install the current Boa executable/script to a target path",
+    )
+    install_p.add_argument("destination", type=str)
+    install_p.add_argument(
+        "--force",
+        action="store_true",
+        help="Overwrite destination if it already exists",
+    )
+
     sub.add_parser("version", help="Print Boa version")
     sub.add_parser("help", help="Show usage")
     return parser
@@ -61,6 +74,49 @@ def _cmd_run(source: Path) -> int:
     return 0
 
 
+def _current_installable_path() -> Path:
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve()
+    argv0 = Path(sys.argv[0])
+    if argv0.exists():
+        return argv0.resolve()
+    return Path(__file__).resolve()
+
+
+def _resolve_install_destination(destination: Path, source_name: str) -> Path:
+    if destination.exists() and destination.is_dir():
+        return destination / source_name
+    return destination
+
+
+def _cmd_install(destination: Path, *, force: bool = False) -> int:
+    source = _current_installable_path()
+    target = _resolve_install_destination(destination, source.name)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    source_resolved = source.resolve(strict=False)
+    target_resolved = target.resolve(strict=False)
+
+    if source_resolved == target_resolved:
+        print(f"Already installed at {target}")
+        return 0
+
+    if target.exists() and not force:
+        print(
+            f"Destination already exists: {target} (use --force to overwrite)",
+            file=sys.stderr,
+        )
+        return 1
+
+    shutil.copy2(source, target)
+    if not sys.platform.startswith("win"):
+        current_mode = target.stat().st_mode
+        if not current_mode & stat.S_IXUSR:
+            target.chmod(current_mode | stat.S_IXUSR)
+
+    print(f"Installed {target}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
@@ -73,6 +129,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     try:
+        if args.command == "install":
+            return _cmd_install(Path(args.destination), force=args.force)
+
         source = Path(args.source)
         if not source.exists():
             print(f"File not found: {source}", file=sys.stderr)

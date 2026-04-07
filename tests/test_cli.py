@@ -3,8 +3,11 @@
 from __future__ import annotations
 
 from pathlib import Path
+import stat
 import subprocess
 import sys
+
+import pytest
 
 from boa import __version__
 from boa.cli import main
@@ -36,3 +39,80 @@ def test_cli_script_mode_version() -> None:
     )
     assert result.returncode == 0
     assert result.stdout.strip() == __version__
+
+
+def test_cli_install_to_new_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    source = tmp_path / "boa-source"
+    source.write_text("boa", encoding="utf-8")
+
+    monkeypatch.setattr("boa.cli._current_installable_path", lambda: source)
+    destination = tmp_path / "bin" / "boa"
+    code = main(["install", str(destination)])
+
+    assert code == 0
+    assert destination.exists()
+    assert destination.read_text(encoding="utf-8") == "boa"
+
+
+def test_cli_install_to_existing_directory(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "boa-source"
+    source.write_text("boa", encoding="utf-8")
+
+    monkeypatch.setattr("boa.cli._current_installable_path", lambda: source)
+    destination_dir = tmp_path / "bin"
+    destination_dir.mkdir()
+    code = main(["install", str(destination_dir)])
+
+    expected = destination_dir / source.name
+    assert code == 0
+    assert expected.exists()
+    assert expected.read_text(encoding="utf-8") == "boa"
+
+
+def test_cli_install_rejects_existing_file_without_force(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "boa-source"
+    source.write_text("new", encoding="utf-8")
+
+    monkeypatch.setattr("boa.cli._current_installable_path", lambda: source)
+    destination = tmp_path / "bin" / "boa"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text("old", encoding="utf-8")
+
+    code = main(["install", str(destination)])
+    assert code == 1
+    assert destination.read_text(encoding="utf-8") == "old"
+
+
+def test_cli_install_overwrites_existing_file_with_force(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "boa-source"
+    source.write_text("new", encoding="utf-8")
+
+    monkeypatch.setattr("boa.cli._current_installable_path", lambda: source)
+    destination = tmp_path / "bin" / "boa"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.write_text("old", encoding="utf-8")
+
+    code = main(["install", str(destination), "--force"])
+    assert code == 0
+    assert destination.read_text(encoding="utf-8") == "new"
+
+
+@pytest.mark.skipif(sys.platform.startswith("win"), reason="POSIX mode bits only")
+def test_cli_install_sets_user_executable_bit(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "boa-source"
+    source.write_text("boa", encoding="utf-8")
+
+    monkeypatch.setattr("boa.cli._current_installable_path", lambda: source)
+    destination = tmp_path / "bin" / "boa"
+    code = main(["install", str(destination)])
+
+    assert code == 0
+    assert destination.stat().st_mode & stat.S_IXUSR
