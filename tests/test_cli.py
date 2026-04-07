@@ -41,7 +41,7 @@ def test_cli_script_mode_version() -> None:
     assert result.stdout.strip() == __version__
 
 
-def test_cli_install_to_file_path(tmp_path: Path, monkeypatch) -> None:
+def test_cli_install_to_new_path(tmp_path: Path, monkeypatch) -> None:
     source = tmp_path / "boa-source"
     source.write_text("boa", encoding="utf-8")
 

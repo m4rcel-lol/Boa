@@ -93,8 +93,8 @@ def _cmd_install(destination: Path, *, force: bool = False) -> int:
     source = _current_installable_path()
     target = _resolve_install_destination(destination, source.name)
     target.parent.mkdir(parents=True, exist_ok=True)
-    source_resolved = source.resolve()
-    target_resolved = target.resolve()
+    source_resolved = source.resolve(strict=False)
+    target_resolved = target.resolve(strict=False)
 
     if source_resolved == target_resolved:
         print(f"Already installed at {target}")
