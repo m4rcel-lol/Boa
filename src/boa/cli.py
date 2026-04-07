@@ -77,9 +77,9 @@ def _cmd_run(source: Path) -> int:
 def _current_installable_path() -> Path:
     if getattr(sys, "frozen", False):
         return Path(sys.executable).resolve()
-    argv0 = Path(sys.argv[0]).resolve()
+    argv0 = Path(sys.argv[0])
     if argv0.exists():
-        return argv0
+        return argv0.resolve()
     return Path(__file__).resolve()
 
 
@@ -93,8 +93,10 @@ def _cmd_install(destination: Path, *, force: bool = False) -> int:
     source = _current_installable_path()
     target = _resolve_install_destination(destination, source.name)
     target.parent.mkdir(parents=True, exist_ok=True)
+    source_resolved = source.resolve()
+    target_resolved = target.resolve()
 
-    if source == target:
+    if source_resolved == target_resolved:
         print(f"Already installed at {target}")
         return 0
 
@@ -107,7 +109,9 @@ def _cmd_install(destination: Path, *, force: bool = False) -> int:
 
     shutil.copy2(source, target)
     if not sys.platform.startswith("win"):
-        target.chmod(target.stat().st_mode | stat.S_IXUSR)
+        current_mode = target.stat().st_mode
+        if not current_mode & stat.S_IXUSR:
+            target.chmod(current_mode | stat.S_IXUSR)
 
     print(f"Installed {target}")
     return 0
