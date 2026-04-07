@@ -39,6 +39,7 @@ def test_cli_script_mode_version() -> None:
 
 
 def test_cli_check_sample_hello() -> None:
-    sample = Path(__file__).resolve().parent / "samples" / "hello.boa"
-    code = main(["check", str(sample)])
+    samples_dir = Path(__file__).resolve().parent / "samples"
+    sample_path = samples_dir / "hello.boa"
+    code = main(["check", str(sample_path)])
     assert code == 0
