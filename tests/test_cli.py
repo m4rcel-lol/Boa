@@ -36,3 +36,31 @@ def test_cli_script_mode_version() -> None:
     )
     assert result.returncode == 0
     assert result.stdout.strip() == __version__
+
+
+def test_cli_install_to_file_path(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "boa-source"
+    source.write_text("boa", encoding="utf-8")
+
+    monkeypatch.setattr("boa.cli._current_installable_path", lambda: source)
+    destination = tmp_path / "bin" / "boa"
+    code = main(["install", str(destination)])
+
+    assert code == 0
+    assert destination.exists()
+    assert destination.read_text(encoding="utf-8") == "boa"
+
+
+def test_cli_install_to_existing_directory(tmp_path: Path, monkeypatch) -> None:
+    source = tmp_path / "boa-source"
+    source.write_text("boa", encoding="utf-8")
+
+    monkeypatch.setattr("boa.cli._current_installable_path", lambda: source)
+    destination_dir = tmp_path / "bin"
+    destination_dir.mkdir()
+    code = main(["install", str(destination_dir)])
+
+    expected = destination_dir / source.name
+    assert code == 0
+    assert expected.exists()
+    assert expected.read_text(encoding="utf-8") == "boa"

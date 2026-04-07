@@ -65,12 +65,14 @@ python -m pip install -e .[dev]
 ```bash
 boa help
 boa version
+boa install /usr/local/bin/boa
 boa check tests/samples/hello.boa
 boa build tests/samples/hello.boa
 boa run tests/samples/hello.boa
 ```
 
 `build` emits a Boa compiler artifact (`.boac`) instead of Python code.
+`install` copies the current Boa executable/script to the path you provide.
 
 ## Example Boa
 
