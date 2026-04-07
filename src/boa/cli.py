@@ -95,7 +95,7 @@ def _cmd_install(destination: Path) -> int:
 
     shutil.copy2(source, target)
     if not sys.platform.startswith("win"):
-        target.chmod(target.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+        target.chmod(target.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP)
 
     print(f"Installed {target}")
     return 0
