@@ -36,3 +36,9 @@ def test_cli_script_mode_version() -> None:
     )
     assert result.returncode == 0
     assert result.stdout.strip() == __version__
+
+
+def test_cli_check_sample_hello() -> None:
+    sample = Path(__file__).resolve().parent / "samples" / "hello.boa"
+    code = main(["check", str(sample)])
+    assert code == 0
