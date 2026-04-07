@@ -6,9 +6,17 @@ import argparse
 from pathlib import Path
 import sys
 
-from . import __version__
-from .compiler import build_file, check_file, run_file
-from .errors import BoaError
+if __package__:
+    from . import __version__
+    from .compiler import build_file, check_file, run_file
+    from .errors import BoaError
+else:  # pragma: no cover - used when executed as a direct script/frozen entrypoint
+    src_dir = Path(__file__).resolve().parents[1]
+    if str(src_dir) not in sys.path:
+        sys.path.insert(0, str(src_dir))
+    from boa import __version__
+    from boa.compiler import build_file, check_file, run_file
+    from boa.errors import BoaError
 
 
 def _build_parser() -> argparse.ArgumentParser:
