@@ -8,7 +8,8 @@ fn main():
     name = ask "Enter your name: "
     out greet(name)
     nums = [1, 2, 3, 4, 5]
-    out #nums
-    out [x * 2 for x ~ nums]
+    out len(nums)
+    for x ~ nums:
+        out x * 2
 
 main()

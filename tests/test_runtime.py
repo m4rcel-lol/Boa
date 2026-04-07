@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from io import StringIO
+from pathlib import Path
 import sys
 
 from boa.compiler import run_source
@@ -34,3 +35,18 @@ def test_fstring_interpolation() -> None:
     src = "name: s = \"Boa\"\nout f\"Hello, {name}!\"\n"
     out = _capture_output(src)
     assert out.strip() == "Hello, Boa!"
+
+
+def test_run_hello_sample(monkeypatch) -> None:
+    sample = Path(__file__).resolve().parent / "samples" / "hello.boa"
+    monkeypatch.setattr("builtins.input", lambda _prompt="": "Boa")
+    out = _capture_output(sample.read_text(encoding="utf-8"))
+    assert out.strip().splitlines() == [
+        "Hello, Boa!",
+        "5",
+        "2",
+        "4",
+        "6",
+        "8",
+        "10",
+    ]
