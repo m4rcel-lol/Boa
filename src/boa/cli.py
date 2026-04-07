@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import argparse
-import shutil
 from pathlib import Path
+import shutil
 import stat
 import sys
 
