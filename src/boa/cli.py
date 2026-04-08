@@ -147,7 +147,7 @@ def main(argv: list[str] | None = None) -> int:
 
         parser.print_help()
         return 1
-    except (BoaError, ValueError) as exc:
+    except (BoaError, ValueError, OSError) as exc:
         print(str(exc), file=sys.stderr)
         return 1
 
