@@ -110,10 +110,10 @@ def test_cli_install_handles_permission_error(
     source.write_text("new", encoding="utf-8")
 
     monkeypatch.setattr("boa.cli._current_installable_path", lambda: source)
-    def raise_permission_error(*_args: object, **_kwargs: object) -> None:
+    def mock_permission_error(*_args: object, **_kwargs: object) -> None:
         raise PermissionError("Access denied")
 
-    monkeypatch.setattr("boa.cli.shutil.copy2", raise_permission_error)
+    monkeypatch.setattr("boa.cli.shutil.copy2", mock_permission_error)
 
     destination = tmp_path / "protected" / "boa"
     code = main(["install", str(destination), "--force"])
