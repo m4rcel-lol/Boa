@@ -103,6 +103,25 @@ def test_cli_install_overwrites_existing_file_with_force(
     assert destination.read_text(encoding="utf-8") == "new"
 
 
+def test_cli_install_handles_permission_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    source = tmp_path / "boa-source"
+    source.write_text("new", encoding="utf-8")
+
+    monkeypatch.setattr("boa.cli._current_installable_path", lambda: source)
+    monkeypatch.setattr(
+        "boa.cli.shutil.copy2", lambda *_args, **_kwargs: (_ for _ in ()).throw(PermissionError("Access denied"))
+    )
+
+    destination = tmp_path / "protected" / "boa"
+    code = main(["install", str(destination), "--force"])
+    captured = capsys.readouterr()
+
+    assert code == 1
+    assert "Access denied" in captured.err
+
+
 @pytest.mark.skipif(sys.platform.startswith("win"), reason="POSIX mode bits only")
 def test_cli_install_sets_user_executable_bit(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
